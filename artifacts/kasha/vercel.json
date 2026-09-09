@@ -5,6 +5,10 @@
       "destination": "https://api.kashaonline.in/api/:path*"
     },
     {
+      "source": "/products/:id",
+      "destination": "https://api.kashaonline.in/api/seo/products/:id"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
