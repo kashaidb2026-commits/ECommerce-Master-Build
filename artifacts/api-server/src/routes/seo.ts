@@ -27,7 +27,7 @@ router.get("/products/:id", async (req, res): Promise<void> => {
     }
 
     // Fetch the existing production SPA shell rather than maintaining a second
-    // copy of the frontend HTML. The rewrite keeps the browser URL unchanged.
+    // copy of the frontend HTML. The Vercel rewrite keeps the browser URL unchanged.
     const shellResponse = await fetch(`${FRONTEND_URL}/index.html`, {
       headers: { Accept: "text/html" },
       signal: AbortSignal.timeout(5000),
@@ -40,8 +40,6 @@ router.get("/products/:id", async (req, res): Promise<void> => {
     const appHtml = await shellResponse.text();
     const html = buildProductSeoHtml(product, appHtml);
 
-    // The API server normally sends a restrictive CSP because it serves JSON.
-    // This response is intentionally an HTML pass-through for the existing SPA.
     res.removeHeader("Content-Security-Policy");
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("X-Robots-Tag", "index, follow");
@@ -49,8 +47,8 @@ router.get("/products/:id", async (req, res): Promise<void> => {
     res.status(200).send(html);
   } catch (err) {
     req.log.error({ err }, "Failed to render product SEO page");
-    // Fail closed rather than serving a broken/partial HTML document. Vercel's
-    // normal catch-all remains the production fallback until this route is healthy.
+    // Return a 503 so Vercel can treat this as an upstream failure instead of
+    // caching incomplete HTML. Normal frontend behavior is otherwise untouched.
     res.status(503).send("Product page temporarily unavailable");
   }
 });
