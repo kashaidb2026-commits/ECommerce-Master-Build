@@ -1,4 +1,4 @@
-import type { Product } from "@shared/types";
+import type { Product } from "@workspace/db/schema";
 
 const SITE_URL = "https://www.kashaonline.in";
 
@@ -19,6 +19,17 @@ function absoluteUrl(value: string | null | undefined): string | undefined {
 
 function jsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
+function removeExistingSeoTags(head: string): string {
+  return head
+    .replace(/<title>[\s\S]*?<\/title>/gi, "")
+    .replace(/<meta\s+name=["']description["'][^>]*>\s*/gi, "")
+    .replace(/<meta\s+name=["']robots["'][^>]*>\s*/gi, "")
+    .replace(/<link\s+rel=["']canonical["'][^>]*>\s*/gi, "")
+    .replace(/<meta\s+property=["']og:[^"']+["'][^>]*>\s*/gi, "")
+    .replace(/<meta\s+name=["']twitter:[^"']+["'][^>]*>\s*/gi, "")
+    .replace(/<script\s+type=["']application\/ld\+json["'][\s\S]*?<\/script>\s*/gi, "");
 }
 
 export function buildProductSeoHtml(product: Product, appHtml: string): string {
@@ -73,7 +84,6 @@ export function buildProductSeoHtml(product: Product, appHtml: string): string {
   `;
 
   return appHtml
-    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(name)} | Ka.Sha</title>`)
-    .replace(/<\/head>/i, `${meta}\n</head>`)
+    .replace(/<head>([\s\S]*?)<\/head>/i, (_match, head: string) => `<head>${removeExistingSeoTags(head)}${meta}\n</head>`)
     .replace(/<div id="root"><\/div>/i, `<div id="root">${crawlableContent}</div>`);
 }
