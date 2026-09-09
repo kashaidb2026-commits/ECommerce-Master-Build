@@ -1,7 +1,8 @@
 name: Apply Studio Back Fix
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [client-fixes-1-4]
 
 permissions:
   contents: write
