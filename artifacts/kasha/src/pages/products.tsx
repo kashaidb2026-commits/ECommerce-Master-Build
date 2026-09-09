@@ -727,6 +727,11 @@ function ProductCard({ product, imgSrc, cardIndex = 0 }: ProductCardProps) {
       <h3 className="text-neutral-900 mb-0.5 group-hover:!text-[#B8925A] transition-colors" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 15, fontWeight: 500, lineHeight: 1.3 }}>
         {product.name.replace(/\s+[—–-]\s*[A-Z]{1,3}\d+.*$/, "")}
       </h3>
+      {product.sku && (
+        <p style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: 8.5, letterSpacing: "0.16em", color: "rgba(0,0,0,0.42)", textTransform: "uppercase", marginBottom: 3 }}>
+          Style {product.sku}
+        </p>
+      )}
       {(() => {
         const colorLabel = getProductColorLabel(product);
         const swatchHex = colorLabelToSwatchHex(colorLabel);

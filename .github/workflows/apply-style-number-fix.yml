@@ -1,0 +1,47 @@
+name: Apply Style Number Fix
+
+on:
+  push:
+    branches: [client-fixes-1-4]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: client-fixes-1-4
+          fetch-depth: 0
+      - name: Add style number to product cards
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('artifacts/kasha/src/pages/products.tsx')
+          s = p.read_text()
+          if 'Style {product.sku}' in s:
+              print('Style number already present; nothing to do')
+          else:
+              pattern = r'(\n\s*<h3 className="text-neutral-900 mb-0\.5 group-hover:!text-\[#B8925A\] transition-colors"[\s\S]*?</h3>)\n(\s*\{\(\) => \{)'
+              replacement = r'''\1
+      {product.sku && (
+        <p style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: 8.5, letterSpacing: "0.16em", color: "rgba(0,0,0,0.42)", textTransform: "uppercase", marginBottom: 3 }}>
+          Style {product.sku}
+        </p>
+      )}
+\2'''
+              s2, n = re.subn(pattern, replacement, s, count=1)
+              if n != 1:
+                  raise SystemExit(f'Product card title anchor matches={n}; refusing unsafe edit')
+              p.write_text(s2)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/kasha/src/pages/products.tsx
+          git diff --cached --quiet || git commit -m "fix: display style number on product cards"
+          git push origin HEAD:client-fixes-1-4
