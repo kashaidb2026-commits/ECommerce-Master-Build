@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
 import productsRouter from "./products";
+import seoRouter from "./seo";
 import customizationsRouter from "./customizations";
 import cartRouter from "./cart";
 import ordersRouter from "./orders";
@@ -26,6 +27,7 @@ router.use(shiprocketWebhookRouter);
 router.use(razorpayWebhookRouter);
 router.use(healthRouter);
 router.use(productsRouter);
+router.use("/seo", seoRouter);
 router.use(customizationsRouter);
 router.use(cartRouter);
 router.use(ordersRouter);
