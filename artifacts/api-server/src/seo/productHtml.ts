@@ -1,4 +1,4 @@
-import type { Product } from "@shared/types";
+import type { Product } from "@workspace/db/schema";
 
 const SITE_URL = "https://www.kashaonline.in";
 
