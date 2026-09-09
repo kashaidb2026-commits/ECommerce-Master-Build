@@ -397,6 +397,16 @@ export default function CustomizePage() {
   const _entryDesign = new URLSearchParams(searchStr).get("design");
   // Source of navigation: "modal" = came from CustomizeEntryModal, "product" = came from PDP
   const _fromSource = new URLSearchParams(searchStr).get("from") ?? null;
+
+  // Return to the actual page the customer came from.
+  const handleStudioBack = useCallback(() => {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+    setLocation(_fromSource === "saved" ? "/profile?tab=designs" : id ? `/products/${id}` : "/products");
+  }, [id, _fromSource, setLocation]);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const entryDesignRef = useRef(_entryDesign); // stable ref — captured once at mount
 
@@ -1982,19 +1992,19 @@ export default function CustomizePage() {
       }}>
         {/* Left: back + logo */}
         <div style={{display:"flex",alignItems:"center",gap:isXs ? 8 : 14,minWidth:180}}>
-          <Link href={_fromSource === "modal" ? "/products" : _fromSource === "saved" ? "/profile?tab=designs" : id ? `/products/${id}` : "/products"} style={{
+          <button type="button" onClick={handleStudioBack} style={{
             color:V.mu,fontSize:11,textDecoration:"none",
             display:"flex",alignItems:"center",gap:5,
             padding:isXs ? "5px 8px" : "5px 12px",borderRadius:40,
             border:`1px solid rgba(201,168,76,0.25)`,
             transition:"all 0.25s",fontWeight:500,letterSpacing:".05em",
-            fontFamily:"'Jost',sans-serif",
+            fontFamily:"'Jost',sans-serif",background:"transparent",cursor:"pointer",
           }}
           onMouseEnter={e=>{e.currentTarget.style.borderColor=V.ac;e.currentTarget.style.background=V.aclt;}}
           onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(201,168,76,0.25)";e.currentTarget.style.background="transparent";}}>
             <span style={{fontSize:isXs ? 16 : 13,lineHeight:1}}>←</span>
             <span>Back</span>
-          </Link>
+          </button>
           <div style={{width:1,height:18,background:`rgba(26,26,24,0.1)`}}/>
           <Link href="/" style={{display:"inline-flex",alignItems:"center"}}>
             <img
