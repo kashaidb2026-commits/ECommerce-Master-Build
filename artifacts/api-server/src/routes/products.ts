@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, ne, and, or, ilike } from "drizzle-orm";
+import { eq, ne, and, or, ilike, desc } from "drizzle-orm";
 import { db, productsTable } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -37,8 +37,8 @@ router.get("/products", async (req, res): Promise<void> => {
     }
 
     const products = conditions.length === 1
-      ? await db.select().from(productsTable).where(conditions[0])
-      : await db.select().from(productsTable).where(and(...conditions));
+      ? await db.select().from(productsTable).where(conditions[0]).orderBy(desc(productsTable.createdAt), desc(productsTable.id))
+      : await db.select().from(productsTable).where(and(...conditions)).orderBy(desc(productsTable.createdAt), desc(productsTable.id));
 
     res.json(products.map(formatProduct));
   } catch (err) {

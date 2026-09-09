@@ -1,0 +1,42 @@
+name: Apply Studio Back Fix
+
+on:
+  push:
+    branches: [client-fixes-1-4]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: client-fixes-1-4
+          fetch-depth: 0
+      - name: Patch back navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('artifacts/kasha/src/pages/customize.tsx')
+          s = p.read_text()
+          old = '''  const _fromSource = new URLSearchParams(searchStr).get("from") ?? null;\n  // eslint-disable-next-line react-hooks/exhaustive-deps\n  const entryDesignRef = useRef(_entryDesign); // stable ref — captured once at mount\n'''
+          new = '''  const _fromSource = new URLSearchParams(searchStr).get("from") ?? null;\n\n  // Return to the actual page the customer came from.\n  const handleStudioBack = useCallback(() => {\n    if (window.history.length > 1) {\n      window.history.back();\n      return;\n    }\n    setLocation(_fromSource === "saved" ? "/profile?tab=designs" : id ? `/products/${id}` : "/products");\n  }, [id, _fromSource, setLocation]);\n\n  // eslint-disable-next-line react-hooks/exhaustive-deps\n  const entryDesignRef = useRef(_entryDesign); // stable ref — captured once at mount\n'''
+          if s.count(old) != 1:
+              raise SystemExit(f'Navigation anchor count={s.count(old)}; refusing unsafe edit')
+          s = s.replace(old, new, 1)
+          old_link = '''          <Link href={_fromSource === "modal" ? "/products" : _fromSource === "saved" ? "/profile?tab=designs" : id ? `/products/${id}` : "/products"} style={{\n            color:V.mu,fontSize:11,textDecoration:"none",\n            display:"flex",alignItems:"center",gap:5,\n            padding:isXs ? "5px 8px" : "5px 12px",borderRadius:40,\n            border:`1px solid rgba(201,168,76,0.25)`,\n            transition:"all 0.25s",fontWeight:500,letterSpacing:".05em",\n            fontFamily:"'Jost',sans-serif",\n          }}\n          onMouseEnter={e=>{e.currentTarget.style.borderColor=V.ac;e.currentTarget.style.background=V.aclt;}}\n          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(201,168,76,0.25)";e.currentTarget.style.background="transparent";}}>\n            <span style={{fontSize:isXs ? 16 : 13,lineHeight:1}}>←</span>\n            <span>Back</span>\n          </Link>'''
+          new_button = '''          <button type="button" onClick={handleStudioBack} style={{\n            color:V.mu,fontSize:11,textDecoration:"none",\n            display:"flex",alignItems:"center",gap:5,\n            padding:isXs ? "5px 8px" : "5px 12px",borderRadius:40,\n            border:`1px solid rgba(201,168,76,0.25)`,\n            transition:"all 0.25s",fontWeight:500,letterSpacing:".05em",\n            fontFamily:"'Jost',sans-serif",background:"transparent",cursor:"pointer",\n          }}\n          onMouseEnter={e=>{e.currentTarget.style.borderColor=V.ac;e.currentTarget.style.background=V.aclt;}}\n          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(201,168,76,0.25)";e.currentTarget.style.background="transparent";}}>\n            <span style={{fontSize:isXs ? 16 : 13,lineHeight:1}}>←</span>\n            <span>Back</span>\n          </button>'''
+          if s.count(old_link) != 1:
+              raise SystemExit(f'Back link count={s.count(old_link)}; refusing unsafe edit')
+          s = s.replace(old_link, new_button, 1)
+          p.write_text(s)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/kasha/src/pages/customize.tsx
+          git diff --cached --quiet || git commit -m "fix: make custom studio back return to previous page"
+          git push origin HEAD:client-fixes-1-4
