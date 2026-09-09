@@ -19,22 +19,24 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
           p = Path('artifacts/kasha/src/pages/products.tsx')
           s = p.read_text()
-          anchor = '''      <h3 className="text-neutral-900 mb-0.5 group-hover:!text-[#B8925A] transition-colors" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 15, fontWeight: 500, lineHeight: 1.3 }}>
-        {product.name.replace(/\\s+[—–-]\\s*[A-Z]{1,3}\\d+.*$/, "")}
-      </h3>
-'''
-          insert = anchor + '''      {product.sku && (
+          if 'Style {product.sku}' in s:
+              print('Style number already present; nothing to do')
+          else:
+              pattern = r'(\n\s*<h3 className="text-neutral-900 mb-0\.5 group-hover:!text-\[#B8925A\] transition-colors"[\s\S]*?</h3>)\n(\s*\{\(\) => \{)'
+              replacement = r'''\1
+      {product.sku && (
         <p style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: 8.5, letterSpacing: "0.16em", color: "rgba(0,0,0,0.42)", textTransform: "uppercase", marginBottom: 3 }}>
           Style {product.sku}
         </p>
       )}
-'''
-          if s.count(anchor) != 1:
-              raise SystemExit(f'Product card title anchor count={s.count(anchor)}; refusing unsafe edit')
-          s = s.replace(anchor, insert, 1)
-          p.write_text(s)
+\2'''
+              s2, n = re.subn(pattern, replacement, s, count=1)
+              if n != 1:
+                  raise SystemExit(f'Product card title anchor matches={n}; refusing unsafe edit')
+              p.write_text(s2)
           PY
       - name: Commit patch
         run: |
