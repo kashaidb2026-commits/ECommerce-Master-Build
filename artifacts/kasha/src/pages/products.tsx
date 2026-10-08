@@ -14,6 +14,7 @@ import { HeartButton } from "@/components/ui/HeartButton";
 import { getProductColorLabel, colorLabelToSwatchHex } from "@/lib/product-color";
 
 type ItemType = "tshirts" | "bottoms" | "dresses";
+type CollectionFilter = "golf" | "gym";
 type StyleFilter = "solids" | "patterns" | "prints" | "trousers" | "shorts" | "skorts";
 
 type SidebarChild = { label: string; style: StyleFilter };
@@ -74,6 +75,7 @@ const KIDS_FALLBACK_IMAGE = "/images/hero/slide-kids.png";
 
 type SidebarParent = {
   label: string;
+  collection: CollectionFilter;
   type: ItemType;
   children: SidebarChild[];
 };
@@ -89,75 +91,56 @@ const sidebar: SidebarSection[] = [
     label: "Men",
     gender: "men",
     parents: [
-      {
-        label: "Golf T-shirts",
-        type: "tshirts",
-        children: [
-          { label: "Solid Polo T-shirts", style: "solids" },
-          { label: "Pattern Polo T-shirts", style: "patterns" },
-          { label: "Print Polo T-shirts", style: "prints" },
-        ],
-      },
-      {
-        label: "Bottoms",
-        type: "bottoms",
-        children: [
-          { label: "Trousers", style: "trousers" },
-          { label: "Shorts", style: "shorts" },
-        ],
-      },
+      { label: "Golf T-shirts", collection: "golf", type: "tshirts", children: [
+        { label: "Solid Polo T-shirts", style: "solids" }, { label: "Pattern Polo T-shirts", style: "patterns" }, { label: "Print Polo T-shirts", style: "prints" },
+      ]},
+      { label: "Gym T-shirts", collection: "gym", type: "tshirts", children: [
+        { label: "Solid Polo T-shirts", style: "solids" }, { label: "Pattern Polo T-shirts", style: "patterns" }, { label: "Print Polo T-shirts", style: "prints" },
+      ]},
+      { label: "Golf Bottoms", collection: "golf", type: "bottoms", children: [
+        { label: "Trousers", style: "trousers" }, { label: "Shorts", style: "shorts" },
+      ]},
+      { label: "Gym Bottoms", collection: "gym", type: "bottoms", children: [
+        { label: "Trousers", style: "trousers" }, { label: "Shorts", style: "shorts" },
+      ]},
     ],
   },
   {
     label: "Women",
     gender: "women",
     parents: [
-      {
-        label: "Golf T-shirts",
-        type: "tshirts",
-        children: [
-          { label: "Solid Polo T-shirts", style: "solids" },
-          { label: "Pattern Polo T-shirts", style: "patterns" },
-          { label: "Print Polo T-shirts", style: "prints" },
-        ],
-      },
-      {
-        label: "Bottoms",
-        type: "bottoms",
-        children: [
-          { label: "Skorts", style: "skorts" },
-          { label: "Trousers", style: "trousers" },
-          { label: "Shorts", style: "shorts" },
-        ],
-      },
-      {
-        label: "Golf Dresses",
-        type: "dresses",
-        children: [],
-      },
+      { label: "Golf T-shirts", collection: "golf", type: "tshirts", children: [
+        { label: "Solid Polo T-shirts", style: "solids" }, { label: "Pattern Polo T-shirts", style: "patterns" }, { label: "Print Polo T-shirts", style: "prints" },
+      ]},
+      { label: "Gym T-shirts", collection: "gym", type: "tshirts", children: [
+        { label: "Solid Polo T-shirts", style: "solids" }, { label: "Pattern Polo T-shirts", style: "patterns" }, { label: "Print Polo T-shirts", style: "prints" },
+      ]},
+      { label: "Golf Bottoms", collection: "golf", type: "bottoms", children: [
+        { label: "Skorts", style: "skorts" }, { label: "Trousers", style: "trousers" }, { label: "Shorts", style: "shorts" },
+      ]},
+      { label: "Gym Bottoms", collection: "gym", type: "bottoms", children: [
+        { label: "Skorts", style: "skorts" }, { label: "Trousers", style: "trousers" }, { label: "Shorts", style: "shorts" },
+      ]},
+      { label: "Golf Dresses", collection: "golf", type: "dresses", children: [] },
+      { label: "Gym Dresses", collection: "gym", type: "dresses", children: [] },
     ],
   },
   ...(SHOW_KIDS ? [{
     label: "Kids",
     gender: "kids" as const,
     parents: [
-      {
-        label: "Golf T-shirts",
-        type: "tshirts" as const,
-        children: [
-          { label: "Solid Polo T-shirts", style: "solids" as const },
-          { label: "Pattern Polo T-shirts", style: "patterns" as const },
-          { label: "Print Polo T-shirts", style: "prints" as const },
-        ],
-      },
-      {
-        label: "Bottoms",
-        type: "bottoms" as const,
-        children: [
-          { label: "Trousers", style: "trousers" as const },
-          { label: "Shorts", style: "shorts" as const },
-        ],
-      },
+      { label: "Golf T-shirts", collection: "golf" as const, type: "tshirts" as const, children: [
+        { label: "Solid Polo T-shirts", style: "solids" as const }, { label: "Pattern Polo T-shirts", style: "patterns" as const }, { label: "Print Polo T-shirts", style: "prints" as const },
+      ]},
+      { label: "Gym T-shirts", collection: "gym" as const, type: "tshirts" as const, children: [
+        { label: "Solid Polo T-shirts", style: "solids" as const }, { label: "Pattern Polo T-shirts", style: "patterns" as const }, { label: "Print Polo T-shirts", style: "prints" as const },
+      ]},
+      { label: "Golf Bottoms", collection: "golf" as const, type: "bottoms" as const, children: [
+        { label: "Trousers", style: "trousers" as const }, { label: "Shorts", style: "shorts" as const },
+      ]},
+      { label: "Gym Bottoms", collection: "gym" as const, type: "bottoms" as const, children: [
+        { label: "Trousers", style: "trousers" as const }, { label: "Shorts", style: "shorts" as const },
+      ]},
     ],
   }] : []),
 ];
@@ -168,12 +151,15 @@ export default function ProductsPage() {
   const params = new URLSearchParams(searchString);
   const genderParam = params.get("gender");
   const typeParam = params.get("type");
+  const collectionParam = params.get("collection");
   const styleParam = params.get("style");
 
   const gender: Gender | undefined =
     genderParam === "men" || genderParam === "women" || genderParam === "kids" ? genderParam : undefined;
   const type: ItemType | undefined =
     typeParam === "tshirts" || typeParam === "bottoms" || typeParam === "dresses" ? typeParam : undefined;
+  const collection: CollectionFilter | undefined =
+    collectionParam === "golf" || collectionParam === "gym" ? collectionParam : undefined;
   const styleFilter: StyleFilter | undefined =
     styleParam === "solids" || styleParam === "patterns" || styleParam === "prints" ||
     styleParam === "trousers" || styleParam === "shorts" || styleParam === "skorts"
@@ -187,10 +173,10 @@ export default function ProductsPage() {
 
   // Auto-expand the active parent when URL changes
   useEffect(() => {
-    if (gender && type) {
-      setExpanded(prev => new Set([...prev, `${gender}-${type}`]));
+    if (gender && collection && type) {
+      setExpanded(prev => new Set([...prev, `${gender}-${collection}-${type}`]));
     }
-  }, [gender, type]);
+  }, [gender, collection, type]);
 
   const toggleExpanded = useCallback((key: string) => {
     setExpanded(prev => {
@@ -230,6 +216,15 @@ export default function ProductsPage() {
         return tokens.some((t) => hay.includes(t));
       });
       if (matched.length > 0) list = matched;
+    }
+
+    // ── Golf/Gym collection filter ───────────────────────────────────────────
+    // Existing products with no productType are treated as Golf for backwards compatibility.
+    if (collection) {
+      list = list.filter((p) => {
+        const value = (p.productType || "").toLowerCase();
+        return collection === "golf" ? value === "golf" || value === "" : value === "gym";
+      });
     }
 
     // ── Type + style filter ────────────────────────────────────────────────────
@@ -284,30 +279,33 @@ export default function ProductsPage() {
     });
 
     return list;
-  }, [rawProducts, type, gender, styleFilter]);
+  }, [rawProducts, type, gender, collection, styleFilter]);
 
-  const buildHref = (g?: Gender, t?: ItemType, s?: StyleFilter) => {
+  const buildHref = (g?: Gender, c?: CollectionFilter, t?: ItemType, s?: StyleFilter) => {
     const sp = new URLSearchParams();
     if (g) sp.set("gender", g);
+    if (c) sp.set("collection", c);
     if (t) sp.set("type", t);
     if (s) sp.set("style", s);
     const q = sp.toString();
     return q ? `/products?${q}` : "/products";
   };
 
-  const typeLabel = (t?: ItemType) => t === "tshirts" ? "Golf T-shirts" : t === "bottoms" ? "Bottoms" : t === "dresses" ? "Golf Dresses" : null;
+  const collectionLabel = (c?: CollectionFilter) => c === "golf" ? "Golf" : c === "gym" ? "Gym" : null;
+  const typeLabel = (t?: ItemType, c?: CollectionFilter) => t === "tshirts" ? `${collectionLabel(c) || "Golf"} T-shirts` : t === "bottoms" ? `${collectionLabel(c) || "Golf"} Bottoms` : t === "dresses" ? `${collectionLabel(c) || "Golf"} Dresses` : null;
   const styleLabel = (s?: StyleFilter) =>
     s === "solids" ? "Solid" : s === "patterns" ? "Pattern Design" : s === "prints" ? "Printed" :
     s === "trousers" ? "Trousers" : s === "shorts" ? "Shorts" : s === "skorts" ? "Skorts" : null;
 
   const breadcrumb = [
     gender ? gender.charAt(0).toUpperCase() + gender.slice(1) : "All",
-    typeLabel(type),
+    collectionLabel(collection),
+    typeLabel(type, collection),
     styleLabel(styleFilter),
   ].filter(Boolean).join(" / ");
 
-  const heading = gender || type
-    ? `${gender ? gender.charAt(0).toUpperCase() + gender.slice(1) : "All"}${type ? " · " + typeLabel(type) : ""}${styleFilter ? " · " + styleLabel(styleFilter) : ""}`
+  const heading = gender || collection || type
+    ? `${gender ? gender.charAt(0).toUpperCase() + gender.slice(1) : "All"}${collection ? " · " + collectionLabel(collection) : ""}${type ? " · " + typeLabel(type, collection) : ""}${styleFilter ? " · " + styleLabel(styleFilter) : ""}`
     : "The Collection";
 
   const fallbackImageFor = (productId: number) => {
@@ -378,7 +376,7 @@ export default function ProductsPage() {
                   <div key={section.gender} style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
                     {/* Gender header */}
                     <Link
-                      href={buildHref(section.gender, undefined)}
+                      href={buildHref(section.gender, undefined, undefined)}
                       aria-current={sectionActive && !type ? "page" : undefined}
                       className={`block py-3 text-[11px] tracking-[0.28em] uppercase font-medium ${
                         sectionActive ? "text-[#B8925A]" : "text-neutral-900/80 hover:text-neutral-900"
@@ -391,13 +389,13 @@ export default function ProductsPage() {
                     {/* Parent items — only show when this gender is active */}
                     {sectionActive && <ul className="pb-2">
                       {section.parents.map((parent) => {
-                        const accordionKey = `${section.gender}-${parent.type}`;
+                        const accordionKey = `${section.gender}-${parent.collection}-${parent.type}`;
                         const isOpen = expanded.has(accordionKey);
-                        const parentActive = sectionActive && type === parent.type;
+                        const parentActive = sectionActive && collection === parent.collection && type === parent.type;
                         const hasChildren = parent.children.length > 0;
 
                         return (
-                          <li key={parent.type}>
+                          <li key={`${parent.collection}-${parent.type}`}>
                             {/* Parent row */}
                             <button
                               className={`w-full flex items-center justify-between py-1.5 pl-3 pr-1 text-[10px] tracking-[0.22em] uppercase border-l-2 text-left ${
@@ -407,7 +405,7 @@ export default function ProductsPage() {
                               }`}
                               style={{ fontFamily: "'Josefin Sans', sans-serif" }}
                               onClick={() => {
-                                navigate(buildHref(section.gender, parent.type));
+                                navigate(buildHref(section.gender, parent.collection, parent.type));
                                 if (hasChildren) toggleExpanded(accordionKey);
                               }}
                             >
@@ -427,7 +425,7 @@ export default function ProductsPage() {
                                   return (
                                     <li key={child.style}>
                                       <Link
-                                        href={buildHref(section.gender, parent.type, child.style)}
+                                        href={buildHref(section.gender, parent.collection, parent.type, child.style)}
                                         aria-current={childActive ? "page" : undefined}
                                         className={`block py-1 pl-8 text-[9.5px] tracking-[0.22em] uppercase border-l-2 ${
                                           childActive
@@ -487,7 +485,7 @@ export default function ProductsPage() {
                     : "Tailored skorts in our signature stretch fabric — landing in the next drop."}
                 </p>
                 <div className="flex flex-wrap justify-center gap-3">
-                  <Link href={buildHref(gender, "tshirts")} className="text-[10px] uppercase px-7 py-3.5 transition-all hover:!text-neutral-900" style={{ fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.28em", color: "rgba(0,0,0,0.6)", border: "1px solid rgba(0,0,0,0.2)" }}>
+                  <Link href={buildHref(gender, collection ?? "golf", "tshirts")} className="text-[10px] uppercase px-7 py-3.5 transition-all hover:!text-neutral-900" style={{ fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.28em", color: "rgba(0,0,0,0.6)", border: "1px solid rgba(0,0,0,0.2)" }}>
                     Browse T-shirts
                   </Link>
                 </div>

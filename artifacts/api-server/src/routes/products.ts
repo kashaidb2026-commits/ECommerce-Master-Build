@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, ne, and, or, ilike } from "drizzle-orm";
+import { eq, ne, and, or, ilike, isNull } from "drizzle-orm";
 import { db, productsTable } from "@workspace/db";
 
 const router: IRouter = Router();
@@ -20,7 +20,9 @@ router.get("/products", async (req, res): Promise<void> => {
       conditions.push(eq(productsTable.gender, gender));
     }
     if (productType && typeof productType === "string") {
-      conditions.push(eq(productsTable.productType, productType));
+      conditions.push(productType.toLowerCase() === "golf"
+        ? or(eq(productsTable.productType, "golf"), isNull(productsTable.productType))
+        : eq(productsTable.productType, productType));
     }
     if (subType && typeof subType === "string") {
       conditions.push(eq(productsTable.subType, subType));
