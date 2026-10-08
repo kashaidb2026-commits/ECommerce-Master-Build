@@ -395,7 +395,7 @@ export default function ProductsPage() {
                         const hasChildren = parent.children.length > 0;
 
                         return (
-                          <li key={parent.type}>
+                          <li key={`${parent.collection}-${parent.type}`}>
                             {/* Parent row */}
                             <button
                               className={`w-full flex items-center justify-between py-1.5 pl-3 pr-1 text-[10px] tracking-[0.22em] uppercase border-l-2 text-left ${
@@ -485,7 +485,7 @@ export default function ProductsPage() {
                     : "Tailored skorts in our signature stretch fabric — landing in the next drop."}
                 </p>
                 <div className="flex flex-wrap justify-center gap-3">
-                  <Link href={buildHref(gender, "tshirts")} className="text-[10px] uppercase px-7 py-3.5 transition-all hover:!text-neutral-900" style={{ fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.28em", color: "rgba(0,0,0,0.6)", border: "1px solid rgba(0,0,0,0.2)" }}>
+                  <Link href={buildHref(gender, collection ?? "golf", "tshirts")} className="text-[10px] uppercase px-7 py-3.5 transition-all hover:!text-neutral-900" style={{ fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.28em", color: "rgba(0,0,0,0.6)", border: "1px solid rgba(0,0,0,0.2)" }}>
                     Browse T-shirts
                   </Link>
                 </div>
