@@ -30,6 +30,7 @@ interface Product {
   description: string;
   category: string;
   gender?: string | null;
+  productType?: string | null;
   subType?: string | null;
   sku?: string | null;
   stock: number;
@@ -74,6 +75,7 @@ const EMPTY_FORM = {
   description: "",
   category: "polo",
   gender: "",
+  productType: "golf",
   subType: "",
   sku: "",
   stock: 100,
@@ -927,6 +929,7 @@ export default function AdminPage() {
       thumbnailUrl: p.thumbnailUrl ?? "",
       additionalImages: p.additionalImages ?? "",
       gender: p.gender ?? "",
+      productType: p.productType ?? "golf",
       subType: p.subType ?? "",
       sku: p.sku ?? "",
       stock: p.stock ?? 100,
@@ -1237,6 +1240,13 @@ export default function AdminPage() {
                       <option value="men">Men</option>
                       <option value="women">Women</option>
                       <option value="kids">Kids</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs tracking-widest text-muted-foreground uppercase">Collection</label>
+                    <select value={form.productType} onChange={e => setForm(f => ({ ...f, productType: e.target.value }))} className="h-10 border border-input bg-background px-3 text-sm rounded-none">
+                      <option value="golf">Golf</option>
+                      <option value="gym">Gym</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
