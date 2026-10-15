@@ -1243,7 +1243,7 @@ export default function AdminPage() {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs tracking-widest text-muted-foreground uppercase">Collection</label>
+                    <label className="text-xs tracking-widest text-muted-foreground uppercase">Product Type</label>
                     <select value={form.productType} onChange={e => setForm(f => ({ ...f, productType: e.target.value }))} className="h-10 border border-input bg-background px-3 text-sm rounded-none">
                       <option value="golf">Golf</option>
                       <option value="gym">Gym</option>
