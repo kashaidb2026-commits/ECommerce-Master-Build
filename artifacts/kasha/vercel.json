@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/api/seo/products/:id",
+      "destination": "/products/:id",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
